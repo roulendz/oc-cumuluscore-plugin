@@ -7,3 +7,7 @@ clusters:
     tab: "Clusters"
     type: relation
     nameFrom: full_name
+    context:
+        - create
+        - update
+        - preview
