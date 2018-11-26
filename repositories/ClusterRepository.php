@@ -1,6 +1,9 @@
 <?php namespace Initbiz\CumulusCore\Repositories;
 
+use Lang;
 use Event;
+use Validator;
+use October\Rain\Exception\ValidationException;
 use Initbiz\CumulusCore\Contracts\ClusterInterface;
 
 class ClusterRepository implements ClusterInterface
@@ -50,9 +53,13 @@ class ClusterRepository implements ClusterInterface
     /**
      * {@inheritdoc}
      */
-    public function update(array $data, $id, $attribute="cluster_id")
+    public function update(array $data, $id, $attribute="id")
     {
-        return $this->clusterModel->where($attribute, '=', $id)->update($data);
+        $cluster = $this->clusterModel->where($attribute, '=', $id)->first();
+        foreach ($data as $key => $value) {
+            $cluster->$key = $value;
+        }
+        $cluster->save();
     }
 
     /**
@@ -112,16 +119,15 @@ class ClusterRepository implements ClusterInterface
     /**
      * {@inheritdoc}
      */
-    public function canEnterModule(string $clusterSlug, string $moduleSlug)
+    public function canEnterFeature(string $clusterSlug, string $featureCode)
     {
         $this->refreshCurrentCluster($clusterSlug);
-        return $this->currentCluster
-                    ->plan()
-                    ->first()
-                    ->modules()
-                    ->whereSlug($moduleSlug)
-                    ->first()
-            ? true : false;
+
+        $clusterFeatures = $this->getClusterFeatures($clusterSlug);
+
+        $can = in_array($featureCode, $clusterFeatures) ? true : false;
+
+        return $can;
     }
 
     /**
@@ -131,9 +137,9 @@ class ClusterRepository implements ClusterInterface
     {
         $users = '';
 
-        $clustersIds = $this->getUsingArray('slug', $clustersSlugs)->pluck('cluster_id')->toArray();
+        $clustersIds = $this->getUsingArray('slug', $clustersSlugs)->pluck('id')->toArray();
 
-        $users = $this->userRepository->getByRelationPropertiesArray('clusters', 'initbiz_cumuluscore_clusters.cluster_id', $clustersIds);
+        $users = $this->userRepository->getByRelationPropertiesArray('clusters', 'initbiz_cumuluscore_clusters.id', $clustersIds);
 
         return $users;
     }
@@ -141,30 +147,20 @@ class ClusterRepository implements ClusterInterface
     /**
      * {@inheritdoc}
      */
-    public function getClusterModules(string $clusterSlug)
+    public function getClusterFeatures(string $clusterSlug):array
     {
         $this->refreshCurrentCluster($clusterSlug);
-        return $this->currentCluster
-            ->plan()
-            ->first()
-            ->modules()
-            ->get();
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getClusterModulesSlugs(string $clusterSlug)
-    {
-        $currentClusterModules = $this->getClusterModules($clusterSlug);
+        $clusterFeatures = $this->currentCluster->plan()->first()->features;
 
-        $slugs = [];
-        foreach ($currentClusterModules as $module) {
-            $slugs[] = $module->slug;
+        if (!isset($clusterFeatures) || $clusterFeatures === "0") {
+            $clusterFeatures = [];
         }
-        return $slugs;
+
+        $clusterFeatures = (array) $clusterFeatures;
+        return $clusterFeatures;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -191,10 +187,10 @@ class ClusterRepository implements ClusterInterface
         if ($plan) {
             $this->refreshCurrentCluster($clusterSlug);
 
-            Event::fire('initbiz.cumuluscore.addClusterToPlan', [$this->currentCluster, $plan]);
-
             $this->currentCluster->plan()->associate($plan);
             $this->currentCluster->save();
+
+            Event::fire('initbiz.cumuluscore.addClusterToPlan', [$this->currentCluster, $plan]);
         }
     }
 
@@ -239,5 +235,35 @@ class ClusterRepository implements ClusterInterface
         }
 
         return $currentCluster;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function usernameUnique(string $username, string $clusterSlug)
+    {
+        $this->refreshCurrentCluster($clusterSlug);
+
+        $rules = [
+            'username' => 'required|between:4,255|alpha_dash|unique:initbiz_cumuluscore_clusters,username,' . $this->currentCluster->id,
+        ];
+
+        $data = [
+            'username' => $username,
+        ];
+
+        $validator = Validator::make($data, $rules);
+
+        if ($validator->fails()) {
+            return false;
+        }
+
+        $state = Event::fire('initbiz.cumuluscore.usernameUnique', [$username, $clusterSlug], true);
+
+        if ($state === false) {
+            return false;
+        }
+
+        return true;
     }
 }

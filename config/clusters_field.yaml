@@ -3,11 +3,7 @@
 # ===================================
 
 clusters:
-    label: "Clusters"
-    tab: "Clusters"
+    label: "initbiz.cumuluscore::lang.users.cluster_label"
+    tab: "initbiz.cumuluscore::lang.users.cluster_tab"
     type: relation
-    nameFrom: full_name
-    context:
-        - create
-        - update
-        - preview
+    nameFrom: name

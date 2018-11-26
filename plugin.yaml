@@ -2,15 +2,18 @@ plugin:
     name: 'initbiz.cumuluscore::lang.plugin.name'
     description: 'initbiz.cumuluscore::lang.plugin.description'
     author: Initbiz
-    icon: oc-icon-soundcloud
+    icon: oc-icon-cloud
     homepage: 'http://cumulus.init.biz'
 permissions:
+    initbiz.cumuluscore.settings_general:
+        tab: 'initbiz.cumuluscore::lang.permissions.cumulus_tab'
+        label: 'initbiz.cumuluscore::lang.permissions.settings_access_general'
     initbiz.cumuluscore.settings_access_auto_assign:
         tab: 'initbiz.cumuluscore::lang.permissions.cumulus_tab'
         label: 'initbiz.cumuluscore::lang.permissions.settings_access_auto_assign'
-    initbiz.cumuluscore.settings_access_manage_modules:
+    initbiz.cumuluscore.settings_access_manage_features:
         tab: 'initbiz.cumuluscore::lang.permissions.cumulus_tab'
-        label: 'initbiz.cumuluscore::lang.permissions.settings_access_manage_modules'
+        label: 'initbiz.cumuluscore::lang.permissions.settings_access_manage_features'
     initbiz.cumuluscore.access_users:
         tab: 'initbiz.cumuluscore::lang.permissions.cumulus_tab'
         label: 'initbiz.cumuluscore::lang.permissions.access_users'
@@ -24,7 +27,7 @@ navigation:
     cumulus-main-menu:
         label: 'initbiz.cumuluscore::lang.navigation.main'
         url: initbiz/cumuluscore/dashboard
-        icon: icon-soundcloud
+        icon: icon-cloud
         permissions:
             0: 'initbiz.cumuluscore.access*'
         order: '700'

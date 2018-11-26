@@ -29,9 +29,13 @@ class PlanRepository implements PlanInterface
         return $this->planModel->create($data);
     }
 
-    public function update(array $data, $id, $attribute="plan_id")
+    public function update(array $data, $id, $attribute="id")
     {
-        return $this->planModel->where($attribute, '=', $id)->update($data);
+        $plan = $this->planModel->where($attribute, '=', $id)->first();
+        foreach ($data as $key => $value) {
+            $plan->$key = $value;
+        }
+        $plan->save();
     }
 
     public function delete(int $id)
@@ -72,9 +76,9 @@ class PlanRepository implements PlanInterface
 
         $users = '';
 
-        $plansIds = $this->getUsingArray('slug', $plansSlugs)->pluck('plan_id')->toArray();
+        $plansIds = $this->getUsingArray('slug', $plansSlugs)->pluck('id')->toArray();
 
-        $clusters = $this->clusterRepository->getByRelationPropertiesArray('plan', 'initbiz_cumuluscore_plans.plan_id', $plansIds);
+        $clusters = $this->clusterRepository->getByRelationPropertiesArray('plan', 'initbiz_cumuluscore_plans.id', $plansIds);
 
         $clustersSlugs = $clusters->pluck('slug')->toArray();
 
