@@ -1,10 +1,14 @@
 columns:
-    full_name:
+    name:
         label: 'initbiz.cumuluscore::lang.cluster.name'
         searchable: true
         sortable: true
     slug:
         label: 'initbiz.cumuluscore::lang.cluster.slug'
+        searchable: true
+        sortable: true
+    username:
+        label: 'initbiz.cumuluscore::lang.cluster.username'
         searchable: true
         sortable: true
     plan:

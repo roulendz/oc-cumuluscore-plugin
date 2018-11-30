@@ -1,5 +1,5 @@
 fields:
-    full_name:
+    name:
         label: 'Full name'
         span: auto
         required: 1
@@ -9,7 +9,15 @@ fields:
         span: auto
         required: 1
         preset:
-            field: full_name
+            field: name
+            type: slug
+        type: text
+    username:
+        label: 'initbiz.cumuluscore::lang.cluster.username'
+        commentAbove: 'initbiz.cumuluscore::lang.cluster.username_comment'
+        span: full
+        preset:
+            field: name
             type: slug
         type: text
     description:

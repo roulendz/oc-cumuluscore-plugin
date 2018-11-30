@@ -1,5 +1,7 @@
 <?php namespace Initbiz\CumulusCore\Models;
 
+use Db;
+use Event;
 use Model;
 use Cms\Classes\Theme;
 use Cms\Classes\Page as CmsPage;
@@ -20,15 +22,19 @@ class Cluster extends Model
     /**
      * @var array Generate slugs for these attributes.
      */
-    protected $slugs = ['slug' => 'full_name'];
+    protected $slugs = [
+        'slug' => 'name',
+        'username' => 'name',
+    ];
 
     /**
      * Fields to be set as null when left empty
      * @var array
      */
     protected $nullable = [
-        'full_name',
+        'name',
         'slug',
+        'username',
         'plan_id',
         'thoroughfare',
         'city',
@@ -42,8 +48,9 @@ class Cluster extends Model
     ];
 
     protected $fillable = [
-        'full_name',
+        'name',
         'slug',
+        'username',
         'plan_id',
         'thoroughfare',
         'city',
@@ -61,9 +68,10 @@ class Cluster extends Model
      */
     //TODO: problems with auto assigning clusters. While saving model email is required, although it's not...
     // public $rules = [
-    //     'full_name'   => 'required|between:4,255',
-    //     'slug'        => 'between:4,100|unique:initbiz_cumuluscore_clusters',
-    //     'email'       => 'between:6,255|email',
+    //     'name'      => 'required|between:4,255',
+    //     'slug'      => 'between:4,100|unique:initbiz_cumuluscore_clusters',
+    //     'username'  => 'between:4,100|unique:initbiz_cumuluscore_clusters',
+    //     'email'     => 'between:6,255|email',
     // ];
 
     /*
@@ -76,12 +84,11 @@ class Cluster extends Model
      * @var string The database table used by the model.
      */
     public $table = 'initbiz_cumuluscore_clusters';
-    public $primaryKey = 'cluster_id';
+
     public $belongsTo = [
         'plan' => [
             Plan::class,
             'table' => 'initbiz_cumuluscore_plans',
-            'otherKey' => 'plan_id'
         ],
         'country' => [
             Country::class,
@@ -93,7 +100,6 @@ class Cluster extends Model
         'users' => [
             UserModel::class,
             'table' => 'users',
-            'key'      => 'cluster_id',
             'otherKey' => 'user_id'
         ]
     ];
@@ -102,57 +108,26 @@ class Cluster extends Model
         'logo' => ['System\Models\File']
     ];
 
-    public static function getMenuTypeInfo($type)
-    {
-        //TODO To consider extending automatic static menu generating
-        $result = ['dynamicItems' => true];
-
-        $theme = Theme::getActiveTheme();
-
-        $pages = CmsPage::listInTheme($theme, true);
-        $cmsPages = [];
-        foreach ($pages as $page) {
-            if (!$page->hasComponent('cumulusGuard')) {
-                continue;
-            }
-
-            $cmsPages[] = $page;
-        }
-        $result['cmsPages'] = $cmsPages;
-        return $result;
-    }
-
-    public static function resolveMenuItem($item, $url, $theme)
-    {
-        //TODO To consider extending automatic static menu generating
-        $theme = Theme::getActiveTheme();
-        $pages = CmsPage::listInTheme($theme, true);
-        $cumulusPages = [];
-        foreach ($pages as $page) {
-            if (!$page->hasComponent('cumulusGuard')) {
-                continue;
-            }
-            $cumulusPages[] = $page;
-        }
-        $result = null;
-        if (!$item->reference || !$item->cmsPage) {
-            return;
-        }
-
-        $result = [
-            'items' => []
-        ];
-
-        $categoryItem['isActive'] = $categoryItem['url'] == $url;
-        $result['items'][] = $categoryItem;
-
-        return $result;
-    }
-    
     public function scopeApplyPlanFilter($query, $filtered)
     {
         return $query->whereHas('plan', function ($q) use ($filtered) {
             $q->whereIn('plan_id', $filtered);
         });
+    }
+
+    public function beforeSave()
+    {
+        /* This must be on model because every time the model is saved:
+         * backend or repo or anywhere on create or update
+         * there should be ability to check if for example
+         * username is unique and if not, than return false, drop
+         */
+        Db::beginTransaction();
+        $state = Event::fire('initbiz.cumuluscore.beforeClusterSave', [$this], true);
+        if ($state === false) {
+            Db::rollBack();
+            return false;
+        }
+        Db::commit();
     }
 }
