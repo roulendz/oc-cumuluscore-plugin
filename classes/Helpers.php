@@ -1,27 +1,13 @@
 <?php namespace Initbiz\CumulusCore\Classes;
 
-use Auth;
 use Cookie;
 use Session;
-use Cms\Classes\Theme;
-use Cms\Classes\Page as CmsPage;
 use Initbiz\CumulusCore\Models\Cluster;
 use Initbiz\CumulusCore\Models\GeneralSettings;
 use Initbiz\CumulusCore\Repositories\ClusterRepository;
 
 class Helpers
 {
-    public static function getUser()
-    {
-        if (!$user = Auth::getUser()) {
-            return null;
-        }
-
-        $user->touchLastSeen();
-
-        return $user;
-    }
-
     public static function getCluster()
     {
         return Session::get('cumulus_clusterslug', Cookie::get('cumulus_clusterslug'));
@@ -39,6 +25,20 @@ class Helpers
         }
 
         return $clusterSlug;
+    }
+
+    public static function getClusterUsernameFromUrlParam($param)
+    {
+        $clusterUsername = '';
+
+        if (GeneralSettings::get('enable_usernames_in_urls')) {
+            $clusterUsername = $param;
+        } else {
+            $cluster = self::getClusterFromUrlParam($param);
+            $clusterUsername = $cluster->username;
+        }
+
+        return $clusterUsername;
     }
 
     public static function getClusterFromUrlParam($param)
@@ -61,20 +61,8 @@ class Helpers
         return Cluster::where('slug', $slug)->first()->id;
     }
 
-    public static function getFileListToDropdown()
+    public static function clusterUsername($slug)
     {
-        return CmsPage::sortBy('baseFileName')->lists('baseFileName', 'baseFileName');
-    }
-
-    public static function getPageUrl($pageCode, $theme)
-    {
-        $page = CmsPage::loadCached($theme, $pageCode);
-        if (!$page) {
-            return;
-        }
-
-        $url = CmsPage::url($page->getBaseFileName());
-
-        return $url;
+        return Cluster::where('slug', $slug)->first()->username;
     }
 }
