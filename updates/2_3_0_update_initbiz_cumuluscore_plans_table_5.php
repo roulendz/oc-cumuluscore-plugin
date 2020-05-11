@@ -3,24 +3,21 @@
 use Schema;
 use October\Rain\Database\Updates\Migration;
 
-class UpdateInitbizCumuluscorePlansTable2 extends Migration
+class UpdateInitbizCumuluscorePlansTable5 extends Migration
 {
     public function up()
     {
         Schema::table('initbiz_cumuluscore_plans', function ($table) {
-            $table->renameColumn('plan_id', 'id');
-        });
-
-        Schema::table('initbiz_cumuluscore_plans', function ($table) {
-            $table->mediumText('features')->nullable();
+            $table->integer('priority')->nullable();
+            $table->boolean('is_trial')->default(false);
         });
     }
 
     public function down()
     {
         Schema::table('initbiz_cumuluscore_plans', function ($table) {
-            $table->renameColumn('id', 'plan_id');
-            $table->dropColumn('features');
+            $table->dropColumn('priority');
+            $table->dropColumn('is_trial');
         });
     }
 }

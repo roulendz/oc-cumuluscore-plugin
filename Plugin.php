@@ -1,13 +1,26 @@
 <?php namespace Initbiz\CumulusCore;
 
+use Event;
 use Backend;
 use System\Classes\PluginBase;
 use Initbiz\CumulusCore\Classes\Helpers;
-use Initbiz\CumulusCore\Repositories\ClusterRepository;
 
 class Plugin extends PluginBase
 {
-    public $require = ['RainLab.User', 'RainLab.Notify', 'RainLab.Location', 'RainLab.UserPlus', 'RainLab.Pages', 'Initbiz.InitDry'];
+    public $require = [
+        'RainLab.User',
+        'RainLab.Notify',
+        'RainLab.Location',
+        'RainLab.UserPlus',
+        'RainLab.Pages',
+        'Initbiz.InitDry'
+    ];
+
+    public function boot() {
+        Event::subscribe(\Initbiz\CumulusCore\EventHandlers\AutoAssignHandler::class);
+        Event::subscribe(\Initbiz\CumulusCore\EventHandlers\RainlabPagesHandler::class);
+        Event::subscribe(\Initbiz\CumulusCore\EventHandlers\RainlabUserHandler::class);
+    }
 
     public function registerComponents()
     {
@@ -55,18 +68,54 @@ class Plugin extends PluginBase
     {
         return [
             'functions' => [
-                'canEnterFeature' => [$this, 'canEnterFeature']
+                'canEnterFeature' => [$this, 'canEnterFeature'],
+                'canEnterAnyFeature' => [$this, 'canEnterAnyFeature']
             ]
         ];
     }
 
-    public function canEnterFeature($featureCode)
+    public function registerCumulusAnnouncerTypes()
     {
-        $clusterSlug = Helpers::getCluster();
-        $clusterRepository = new ClusterRepository();
+        return [
+            '\Initbiz\CumulusCore\AnnouncerTypes\UserRegisterAnnouncerType',
+        ];
+    }
 
-        $can = $clusterRepository->canEnterFeature($clusterSlug, $featureCode);
+    /**
+     * Twig filter method that checks if a user can enter the feature
+     *
+     * @param string $featureCode
+     * @return boolean
+     */
+    public function canEnterFeature(string $featureCode)
+    {
+        $cluster = Helpers::getCluster();
 
-        return $can;
+        if (! $cluster) {
+            return false;
+        }
+
+        return $cluster->canEnterFeature($featureCode);
+    }
+
+    /**
+     * Twig filter method that checks if a user can enter any of the features supplied
+     *
+     * @param array $featureCodes
+     * @return boolean
+     */
+    public function canEnterAnyFeature($featureCodes)
+    {
+        $cluster = Helpers::getCluster();
+
+        if (! $cluster) {
+            return false;
+        }
+
+        if (!is_array($featureCodes)) {
+            $featureCodes = (array) $featureCodes;
+        }
+
+        return $cluster->canEnterAnyFeature($featureCodes);
     }
 }

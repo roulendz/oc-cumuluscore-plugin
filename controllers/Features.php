@@ -26,8 +26,8 @@ class Features extends Controller
 
     public function index()
     {
-        $this->vars['features'] = $this->featureManager->getFeatures();
         $this->pageTitle = 'initbiz.cumuluscore::lang.settings.features_page_title';
+        $this->vars['features'] = $this->featureManager->getFeatures();
     }
 
     public function onClearCache()

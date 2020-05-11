@@ -1,4 +1,4 @@
-title: Clusters
+title: initbiz.cumuluscore::lang.cluster.list_title
 modelClass: Initbiz\CumulusCore\Models\Cluster
 list: $/initbiz/cumuluscore/models/cluster/columns.yaml
 recordUrl: 'initbiz/cumuluscore/clusters/update/:id'
@@ -6,6 +6,7 @@ noRecordsMessage: 'backend::lang.list.no_records'
 showSetup: true
 showCheckboxes: true
 filter: config_filter.yaml
+recordsPerPage: 20
 toolbar:
     buttons: list_toolbar
     search:

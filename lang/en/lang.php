@@ -11,6 +11,7 @@
     ],
     'users' => [
         'last_first_name' => 'Last and first name',
+        'cluster_tab' => 'Clusters',
     ],
     'settings' => [
         'menu_category' => 'Cumulus',
@@ -88,11 +89,14 @@
         'cluster_dashboard_page_desc' => 'Page where users are going to be redirected after clicking cluster url',
     ],
     'cluster' => [
+        'list_title' => 'Manage clusters',
+        'cluster' => 'Cluster',
         'delete_confirm' => 'Are you sure you want to delete this cluster?',
         'thoroughfare' => 'Thoroughfare',
         'name' => 'Full name',
         'plan' => 'Plan',
         'slug' => 'Slug',
+        'created_at' => 'Created at',
         'username' => 'Username',
         'username_comment' => 'Username is used in URLs instead slug if you enable this feature in settings',
         'logo' => 'Logo',
@@ -108,11 +112,40 @@
         'accounting_details_tab' => 'Accounting details',
         'contact_details_tab' => 'Contact details',
         'plan_filter' => 'Select plans',
+        'users' => 'Users',
     ],
     'plan' => [
+        'plan' => 'Plan',
+        'is_trial' => 'Trial plan',
+        'is_registration_allowed' => 'Allow users registration for this plan',
         'name' => 'Name',
         'slug' => 'Slug',
         'features' => 'Features',
         'delete_confirm' => 'Are you sure you want to delete this plan?',
+        'related_plans_tab' => 'Upgrade / downgrade',
+        'related_plans' => 'related plan',
+        'priority' => 'Priority',
+        'related_plan_relation' => 'Relation',
+        'related_plan_downgrade' => 'Downgrade',
+        'related_plan_upgrade' => 'Upgrade',
+        'related_plan_alternative' => 'Alternative',
+    ],
+    'plan_list' => [
+        'title' => 'Manage plans',
+        'name' => 'Name',
+        'is_trial' => 'Trial',
+        'is_registration_allowed' => 'Registration allowed',
+    ],
+    'restore' => [
+        'flash_success' => 'Items successfully restored',
+        'flash_empty' => 'The list to restore cannot be empty',
+        'confirmation' => 'Are you sure you want to restore the selected items?',
+        'button' => 'Restore',
+    ],
+    'trashed' => [
+        'filter_button' => 'Show trashed',
+    ],
+    'announcers' => [
+        'register_user' => 'New user registered',
     ],
 ];
