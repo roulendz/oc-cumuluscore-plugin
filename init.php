@@ -47,16 +47,16 @@ UserController::extendFormFields(function ($widget) {
     $widget->addTabFields($config);
 });
 
-Event::listen('backend.list.extendColumns', function ($widget) {
-    if ($widget->getController() instanceof UserController) {
-        $widget->removeColumn('name');
-        $widget->addColumns(['full_name' => [
-            'label' => Lang::get('initbiz.cumuluscore::lang.users.last_first_name'),
-            'select' => 'concat(surname, \' \', name)'
-        ]
-        ]);
-    }
-});
+// Event::listen('backend.list.extendColumns', function ($widget) {
+//     if ($widget->getController() instanceof UserController) {
+//         $widget->removeColumn('name');
+//         $widget->addColumns(['full_name' => [
+//             'label' => Lang::get('initbiz.cumuluscore::lang.users.last_first_name'),
+//             'select' => 'concat(surname, \' \', name)'
+//         ]
+//         ]);
+//     }
+// });
 
 Event::listen('rainlab.user.register', function ($user, $data) {
     if (!AutoAssignSettings::get('enable_auto_assign_user')) {

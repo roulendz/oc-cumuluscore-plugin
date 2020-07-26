@@ -17,7 +17,7 @@ class RainlabUserHandler
         $this->addClusterRelation($event);
         $this->addClusterField($event);
         $this->addMethodsToUser($event);
-        $this->addFullNameColumn($event);
+        // $this->addFullNameColumn($event);
         $this->forgetClusterOnLogout($event);
     }
 
@@ -86,19 +86,19 @@ class RainlabUserHandler
         });
     }
 
-    public function addFullNameColumn($event)
-    {
-        $event->listen('backend.list.extendColumns', function ($widget) {
-            if ($widget->getController() instanceof Users) {
-                $widget->removeColumn('name');
-                $widget->addColumns(['full_name' => [
-                    'label' => Lang::get('initbiz.cumuluscore::lang.users.last_first_name'),
-                    'select' => 'concat(surname, \' \', name)'
-                ]
-                ]);
-            }
-        });
-    }
+    // public function addFullNameColumn($event)
+    // {
+    //     $event->listen('backend.list.extendColumns', function ($widget) {
+    //         if ($widget->getController() instanceof Users) {
+    //             $widget->removeColumn('name');
+    //             $widget->addColumns(['full_name' => [
+    //                 'label' => Lang::get('initbiz.cumuluscore::lang.users.last_first_name'),
+    //                 'select' => 'concat(surname, \' \', name)'
+    //             ]
+    //             ]);
+    //         }
+    //     });
+    // }
 
     public function forgetClusterOnLogout($event)
     {
